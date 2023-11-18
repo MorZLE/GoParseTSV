@@ -1,7 +1,6 @@
 package model
 
 type Guid struct {
-	ID           string `gorm:"primary_key" gorm:"AUTO_INCREMENT"`
 	Number       string `tsv:"n"`
 	MQTT         string `tsv:"mqtt"`
 	InventoryID  string `tsv:"invid"`
