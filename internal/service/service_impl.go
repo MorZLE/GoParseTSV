@@ -25,48 +25,46 @@ type serviceImpl struct {
 
 func (s *serviceImpl) Scan() {
 	files := make(chan string)
-
 	defer close(files)
-	go s.w.Scan(files)
 
-	select {
-	case <-files:
-		file := <-files
-		parsGuid, slGuid, err := s.parse(file)
-		if err != nil {
-			logger.Error("ошибка:", err)
-			err := s.r.SetError(file, err)
-			if err != nil {
-				logger.Error("ошибка при записи ошибки:", err)
+	go func() {
+		s.w.Scan(files)
+	}()
+	go func() {
+		for {
+			select {
+			case file := <-files:
+				parsGuid, slGuid, err := s.parse(file)
+				if err != nil {
+					logger.Error("ошибка:", err)
+					err := s.r.SetError(file, err)
+					if err != nil {
+						logger.Error("ошибка при записи ошибки:", err)
+					}
+					continue
+				}
+				err = s.r.Set(parsGuid)
+				if err != nil {
+					logger.Error("ошибка:", err)
+					err := s.r.SetError(file, err)
+					if err != nil {
+						logger.Error("ошибка при записи ошибки:", err)
+					}
+					continue
+				}
+				err = s.writeFilePDF(parsGuid, slGuid)
+				if err != nil {
+					logger.Error("ошибка:", err)
+					err := s.r.SetError(file, err)
+					if err != nil {
+						logger.Error("ошибка при создании файла:", err)
+					}
+					continue
+				}
 			}
 		}
-		err = s.r.Set(parsGuid)
-		if err != nil {
-			logger.Error("ошибка:", err)
-			err := s.r.SetError(file, err)
-			if err != nil {
-				logger.Error("ошибка при записи ошибки:", err)
-			}
-		}
-		err = s.writeFilePDF(parsGuid, slGuid)
-		if err != nil {
-			logger.Error("ошибка:", err)
-			err := s.r.SetError(file, err)
-			if err != nil {
-				logger.Error("ошибка при создании файла:", err)
-			}
-		}
-
-		err = s.r.Set(parsGuid)
-		if err != nil {
-			logger.Error("ошибка:", err)
-			err := s.r.SetError(file, err)
-			if err != nil {
-				logger.Error("ошибка при записи ошибки:", err)
-			}
-		}
-	}
-
+	}()
+	<-make(chan struct{})
 }
 
 func (s *serviceImpl) writeFilePDF(guid []model.Guid, filename []string) error {
@@ -117,7 +115,7 @@ func (s *serviceImpl) parse(filename string) ([]model.Guid, []string, error) {
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		return nil, nil, fmt.Errorf("ошибка при чтение файла", err)
+		return nil, nil, fmt.Errorf("ошибка при чтение файла %s", filename, err)
 	}
 
 	var guid []model.Guid

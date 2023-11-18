@@ -19,6 +19,7 @@ func NewRepositoryImpl(cnf *config.Config) (Repository, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %w", err)
 	}
+
 	return &repositoryImpl{db: db}, nil
 }
 
@@ -39,7 +40,7 @@ func (r *repositoryImpl) Set(guid []model.Guid) error {
 func (r *repositoryImpl) SetError(filename string, err error) error {
 	var guidErr model.Err
 	guidErr.File = filename
-	guidErr.Err = err
+	guidErr.Err = fmt.Sprintf("%v", err)
 	if err := r.db.Create(&guidErr).Error; err != nil {
 		return fmt.Errorf("error create guidErr: %w", err)
 	}

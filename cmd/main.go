@@ -13,7 +13,10 @@ func main() {
 	logger.Initialize()
 
 	conf := config.NewConfig()
-	rep := repository.NewRepositoryImpl(conf)
+	rep, err := repository.NewRepositoryImpl(conf)
+	if err != nil {
+		logger.Fatal("ошибка при создании репозитория:", err)
+	}
 	watch := watcher.NewWatcher(conf)
 
 	logic := service.NewServiceImpl(conf, rep, watch)

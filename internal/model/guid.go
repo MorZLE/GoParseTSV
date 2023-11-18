@@ -21,5 +21,5 @@ type Guid struct {
 
 type Err struct {
 	File string
-	Err  error
+	Err  string
 }

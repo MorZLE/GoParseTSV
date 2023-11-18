@@ -1,54 +1,58 @@
 package config
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"io"
 	"os"
-	"strconv"
 )
 
 type Config struct {
-	RepIN  string
-	RepOUT string
-	Timer  int
-	DB     string
+	RepIN      string `json:"directory_in"`
+	RepOUT     string `json:"directory_out"`
+	Timer      int    `json:"refresh_interval"`
+	DB         string `json:"dsn"`
+	configFile string
 }
 
 func NewConfig() *Config {
-	cnf := &Config{}
-	return ParseFlags(cnf)
+	return ParseFlags()
 }
 
-func ParseFlags(p *Config) *Config {
+func ParseFlags() *Config {
 
-	flag.StringVar(&p.RepIN, "a", "", "directory with .tsv files")
-	flag.StringVar(&p.RepIN, "b", "", "directory output .pdf files")
-	flag.StringVar(&p.RepIN, "t", "1", "time to scan directory")
+	p := Config{}
+	flag.StringVar(&p.configFile, "c", "config.json", "config file")
 
 	flag.Parse()
 
-	if RepIN := os.Getenv("REPIN"); RepIN != "" {
-		p.RepIN = RepIN
+	if err := ReadConfig(&p); err != nil {
+		logger.Fatal("error read config file:", err)
 	}
-	if p.RepIN == "" {
-		logger.Fatal("directory with .tsv files is empty", nil)
+	if p.RepIN == "" || p.RepOUT == "" || p.Timer <= 0 {
+		logger.Fatal("error empty config file:", nil)
 	}
-	if RepOUT := os.Getenv("REPOUT"); RepOUT != "" {
-		p.RepOUT = RepOUT
-	}
-	if p.RepOUT == "" {
-		logger.Fatal("directory output .tsv files is empty", nil)
-	}
-	if Timer := os.Getenv("TIMERSCAN"); Timer != "" {
-		Timer, err := strconv.Atoi(Timer)
-		if err != nil {
-			p.Timer = 1
-			logger.Error("err get env TIMERSCAN:", err)
-			logger.Info("default TIMERSCAN = 1")
-		}
-		p.Timer = Timer
-	}
-	p.DB = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-	return p
+	return &p
 
+}
+
+func ReadConfig(cnf *Config) error {
+	file, err := os.Open(cnf.configFile)
+	if err != nil {
+		return fmt.Errorf("can't open %s: %v", cnf.configFile, err)
+	}
+	defer file.Close()
+
+	all, err := io.ReadAll(file)
+	if err != nil {
+		return fmt.Errorf("can't read %s: %v", cnf.configFile, err)
+	}
+
+	err = json.Unmarshal(all, &cnf)
+	if err != nil {
+		return fmt.Errorf("can't unmarshal %s: %v", cnf.configFile, err)
+	}
+	return nil
 }

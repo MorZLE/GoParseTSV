@@ -1,0 +1,6 @@
+{
+  "directory_in": "D:\\tsv",
+  "directory_out": "D:\\pdf",
+  "dsn": "postgres://postgres:postgres@localhost:5434/postgres",
+  "refresh_interval": 1
+}

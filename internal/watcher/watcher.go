@@ -22,40 +22,40 @@ type Watcher struct {
 }
 
 func (w *Watcher) Scan(out chan string) {
-	//просканировать директорию и проверить на наличие файлов
-	files, err := os.ReadDir(w.dirIN)
-	if err != nil {
-		logger.Error("err read dir", err)
-	}
-
 	tick := time.NewTicker(time.Duration(w.tickerTime) * time.Second)
 	defer tick.Stop()
-
-	select {
-	case <-tick.C:
-		for _, file := range files {
-			//проверка, что файл не директория
-			if file.IsDir() {
-				continue
+	for {
+		select {
+		case <-tick.C:
+			files, err := os.ReadDir(w.dirIN)
+			if err != nil {
+				logger.Error("err read dir", err)
 			}
 
-			//проверка, что есть расширение
-			if len(file.Name()) < 4 {
-				continue
-			}
-			//проверка, что файл .tsv
-			if strings.HasSuffix(file.Name(), ".tsv") {
-				w.mutex.Lock()
-				if w.fileCheck[file.Name()] {
+			for _, file := range files {
+				//проверка, что файл не директория
+				if file.IsDir() {
 					continue
 				}
-				w.fileCheck[file.Name()] = true
-				w.mutex.Unlock()
-				select {
-				case out <- file.Name():
+
+				//проверка, что есть расширение
+				if len(file.Name()) < 4 {
+					continue
+				}
+
+				//проверка, что файл .tsv
+				if strings.HasSuffix(file.Name(), ".tsv") {
+					w.mutex.Lock()
+					if w.fileCheck[file.Name()] {
+						continue
+					}
+					w.fileCheck[file.Name()] = true
+					w.mutex.Unlock()
+					select {
+					case out <- file.Name():
+					}
 				}
 			}
 		}
 	}
-
 }
