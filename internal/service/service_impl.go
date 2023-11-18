@@ -8,18 +8,19 @@ import (
 	"github.com/MorZLE/ParseTSVBiocad/internal/repository"
 	"github.com/MorZLE/ParseTSVBiocad/internal/watcher"
 	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/jung-kurt/gofpdf"
 	"os"
-	"strconv"
 )
 
 func NewServiceImpl(cnf *config.Config, rep repository.Repository, watcher *watcher.Watcher) Service {
-	return &serviceImpl{r: rep, w: watcher, dirIN: cnf.RepIN}
+	return &serviceImpl{r: rep, w: watcher, dirIN: cnf.RepIN, dirOUT: cnf.RepOUT}
 }
 
 type serviceImpl struct {
-	r     repository.Repository
-	w     *watcher.Watcher
-	dirIN string
+	r      repository.Repository
+	w      *watcher.Watcher
+	dirIN  string
+	dirOUT string
 }
 
 func (s *serviceImpl) Scan() {
@@ -55,12 +56,46 @@ func (s *serviceImpl) Scan() {
 				logger.Error("ошибка при создании файла:", err)
 			}
 		}
+
+		err = s.r.Set(parsGuid)
+		if err != nil {
+			logger.Error("ошибка:", err)
+			err := s.r.SetError(file, err)
+			if err != nil {
+				logger.Error("ошибка при записи ошибки:", err)
+			}
+		}
 	}
 
 }
 
 func (s *serviceImpl) writeFilePDF(guid []model.Guid, filename []string) error {
 
+	for _, f := range filename {
+		pdf := gofpdf.New("P", "mm", "A4", f)
+		pdf.SetFont("Arial", "B", 16)
+		for _, g := range guid {
+			if g.UnitGUID == f {
+				pdf.Cell(30, 10, g.Number)
+				pdf.Cell(60, 10, g.MQTT)
+				pdf.Cell(40, 10, g.InventoryID)
+				pdf.Cell(40, 10, g.UnitGUID)
+				pdf.Cell(40, 10, g.MessageID)
+				pdf.Cell(30, 10, g.MessageText)
+				pdf.Cell(60, 10, g.Context)
+				pdf.Cell(40, 10, g.MessageClass)
+				pdf.Cell(40, 10, g.Level)
+				pdf.Cell(40, 10, g.Area)
+				pdf.Cell(30, 10, g.Address)
+				pdf.Cell(60, 10, g.Block)
+				pdf.Cell(40, 10, g.Type)
+				pdf.Cell(40, 10, g.Bit)
+				pdf.Cell(40, 10, g.InvertBit)
+				pdf.Ln(-1)
+			}
+			pdf.OutputFileAndClose(s.dirOUT + f + ".pdf")
+		}
+	}
 	return nil
 }
 
@@ -88,26 +123,6 @@ func (s *serviceImpl) parse(filename string) ([]model.Guid, []string, error) {
 	var guid []model.Guid
 
 	for _, record := range records {
-		number, err := strconv.Atoi(record[1])
-		if err != nil {
-			return nil, nil, fmt.Errorf("ошибка типа поля int", err)
-		}
-		level, err := strconv.Atoi(record[9])
-		if err != nil {
-			return nil, nil, fmt.Errorf("ошибка типа поля int", err)
-		}
-		block, err := strconv.ParseBool(record[12])
-		if err != nil {
-			return nil, nil, fmt.Errorf("ошибка поля Block", err)
-		}
-		bit, err := strconv.Atoi(record[14])
-		if err != nil {
-			return nil, nil, fmt.Errorf("ошибка типа поля int", err)
-		}
-		invertBit, err := strconv.Atoi(record[15])
-		if err != nil {
-			return nil, nil, fmt.Errorf("ошибка типа поля int", err)
-		}
 		unitGUID := record[4]
 
 		if !mGuid[unitGUID] {
@@ -117,7 +132,7 @@ func (s *serviceImpl) parse(filename string) ([]model.Guid, []string, error) {
 
 		g := model.Guid{
 			ID:           record[0],
-			Number:       number,
+			Number:       record[1],
 			MQTT:         record[2],
 			InventoryID:  record[3],
 			UnitGUID:     unitGUID,
@@ -125,13 +140,13 @@ func (s *serviceImpl) parse(filename string) ([]model.Guid, []string, error) {
 			MessageText:  record[6],
 			Context:      record[7],
 			MessageClass: record[8],
-			Level:        level,
+			Level:        record[9],
 			Area:         record[10],
 			Address:      record[11],
-			Block:        block,
+			Block:        record[12],
 			Type:         record[13],
-			Bit:          bit,
-			InvertBit:    invertBit,
+			Bit:          record[14],
+			InvertBit:    record[15],
 		}
 		guid = append(guid, g)
 	}

@@ -11,6 +11,7 @@ type Config struct {
 	RepIN  string
 	RepOUT string
 	Timer  int
+	DB     string
 }
 
 func NewConfig() *Config {
@@ -47,6 +48,7 @@ func ParseFlags(p *Config) *Config {
 		}
 		p.Timer = Timer
 	}
+	p.DB = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
 	return p
 
 }

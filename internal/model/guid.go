@@ -1,20 +1,25 @@
 package model
 
 type Guid struct {
-	ID           string
-	Number       int    `tsv:"n"`
+	ID           string `gorm:"primary_key" gorm:"AUTO_INCREMENT"`
+	Number       string `tsv:"n"`
 	MQTT         string `tsv:"mqtt"`
 	InventoryID  string `tsv:"invid"`
-	UnitGUID     string `tsv:"unit_guid"`
+	UnitGUID     string `tsv:"unit_guid" gorm:"not null"`
 	MessageID    string `tsv:"msg_id"`
 	MessageText  string `tsv:"text"`
 	Context      string `tsv:"context"`
 	MessageClass string `tsv:"class"`
-	Level        int    `tsv:"level"`
+	Level        string `tsv:"level"`
 	Area         string `tsv:"area"`
 	Address      string `tsv:"addr"`
-	Block        bool   `tsv:"block"`
+	Block        string `tsv:"block"`
 	Type         string `tsv:"type"`
-	Bit          int    `tsv:"bit"`
-	InvertBit    int    `tsv:"invert_bit"`
+	Bit          string `tsv:"bit"`
+	InvertBit    string `tsv:"invert_bit"`
+}
+
+type Err struct {
+	File string
+	Err  error
 }
