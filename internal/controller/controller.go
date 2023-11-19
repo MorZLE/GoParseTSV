@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/MorZLE/ParseTSVBiocad/service"
+import (
+	"github.com/MorZLE/ParseTSVBiocad/internal/service"
+)
 
 func NewHandler(s service.Service) *Handler {
 	return &Handler{s}
