@@ -22,3 +22,13 @@ type Err struct {
 	File string
 	Err  string
 }
+
+type ParseFile struct {
+	File string
+}
+
+type RequestGetGuid struct {
+	UnitGUID string `json:"unitguid"`
+	Page     int    `json:"page"`
+	Limite   int    `json:"limite"`
+}

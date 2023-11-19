@@ -1,8 +1,10 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"github.com/MorZLE/ParseTSVBiocad/config"
+	"github.com/MorZLE/ParseTSVBiocad/constants"
 	"github.com/MorZLE/ParseTSVBiocad/internal/model"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
@@ -15,7 +17,7 @@ func NewRepositoryImpl(cnf *config.Config) (Repository, error) {
 		return nil, fmt.Errorf("failed to connect database: %w", err)
 	}
 
-	err = db.Debug().AutoMigrate(&model.Guid{}, &model.Err{})
+	err = db.Debug().AutoMigrate(&model.Guid{}, &model.Err{}, &model.ParseFile{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to migrate database: %w", err)
 	}
@@ -27,8 +29,15 @@ type repositoryImpl struct {
 	db *gorm.DB
 }
 
-func (r *repositoryImpl) Get(interface{}) error {
-	return nil
+func (r *repositoryImpl) Get(guid string) ([]model.Guid, error) {
+	var guidAPI []model.Guid
+	if err := r.db.Where("unit_guid = ?", guid).Find(&guidAPI).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, constants.ErrNotFound
+		}
+		return nil, fmt.Errorf("error get guid: %w", err)
+	}
+	return guidAPI, nil
 }
 func (r *repositoryImpl) Set(guid []model.Guid) error {
 	if err := r.db.Create(&guid).Error; err != nil {
@@ -41,8 +50,27 @@ func (r *repositoryImpl) SetError(filename string, err error) error {
 	var guidErr model.Err
 	guidErr.File = filename
 	guidErr.Err = fmt.Sprintf("%v", err)
+
 	if err := r.db.Create(&guidErr).Error; err != nil {
 		return fmt.Errorf("error create guidErr: %w", err)
 	}
 	return nil
+}
+
+func (r *repositoryImpl) SetFileName(filename string) error {
+	if err := r.db.Create(&model.ParseFile{File: filename}).Error; err != nil {
+		return fmt.Errorf("error create guid: %w", err)
+	}
+	return nil
+}
+
+func (r *repositoryImpl) GetFileName() ([]model.ParseFile, error) {
+	var filenames []model.ParseFile
+	if err := r.db.Find(&filenames).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return filenames, nil
+		}
+		return nil, fmt.Errorf("error get filenames: %w", err)
+	}
+	return filenames, nil
 }

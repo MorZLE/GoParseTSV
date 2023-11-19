@@ -1,7 +1,8 @@
-package watcher
+package workers
 
 import (
 	"github.com/MorZLE/ParseTSVBiocad/config"
+	"github.com/MorZLE/ParseTSVBiocad/internal/model"
 	"github.com/MorZLE/ParseTSVBiocad/logger"
 	"os"
 	"strings"
@@ -19,6 +20,12 @@ type Watcher struct {
 	dirIN      string
 	fileCheck  map[string]bool
 	mutex      sync.RWMutex
+}
+
+func (w *Watcher) InitFileCheck(files []model.ParseFile) {
+	for _, file := range files {
+		w.fileCheck[file.File] = true
+	}
 }
 
 func (w *Watcher) Scan(out chan string) {

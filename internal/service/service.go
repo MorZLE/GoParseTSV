@@ -4,5 +4,5 @@ import "github.com/MorZLE/ParseTSVBiocad/internal/model"
 
 type Service interface {
 	Scan()
-	parse(filename string) ([]model.Guid, []string, error)
+	GetAllGuid(guid model.RequestGetGuid) ([][]model.Guid, error)
 }
