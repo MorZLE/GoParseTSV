@@ -70,7 +70,7 @@ func (s *serviceImpl) Scan() {
 }
 
 func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, error) {
-	if req.UnitGUID == "" || req.Limite <= 0 {
+	if req.UnitGUID == "" || req.Limite <= 0 || req.Page < 0 {
 		return nil, constants.ErrEnabledData
 	}
 
@@ -87,14 +87,20 @@ func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, erro
 		if i < req.Page {
 			continue
 		}
-		if cPage <= req.Limite {
-			gd = append(gd, guid)
-		} else if cPage > req.Limite {
+		if cPage > req.Limite {
 			guidsRes = append(guidsRes, gd)
 			gd = nil
-			cPage = 1
+			gd = append(gd, guid)
+			cPage = 2
+			continue
+		}
+		if cPage <= req.Limite {
+			gd = append(gd, guid)
 		}
 		cPage++
+	}
+	if gd != nil {
+		guidsRes = append(guidsRes, gd)
 	}
 
 	return guidsRes, nil

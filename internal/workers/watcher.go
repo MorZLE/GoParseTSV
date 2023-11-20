@@ -37,7 +37,6 @@ func (w *Watcher) Scan(out chan string) {
 		if err != nil {
 			logger.Fatal("err read dir", err)
 		}
-
 		for _, file := range files {
 			if !file.IsDir() && len(file.Name()) >= 4 && strings.HasSuffix(file.Name(), ".tsv") {
 				w.mutex.Lock()
