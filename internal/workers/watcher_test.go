@@ -53,32 +53,6 @@ func TestWatcher_Scan(t *testing.T) {
 	removeTempDir(tesdir)
 }
 
-//createTempDir создает временную директорию
-//func createTempDir(t *testing.T) {
-//	err := os.Mkdir("testdir", os.ModeDir)
-//	if err != nil {
-//		t.Fatalf("Failed to create temporary directory: %v", err)
-//	}
-//	err = os.Chmod("testdir", 0700)
-//	if err != nil {
-//		t.Fatalf("Failed to create Chmod directory: %v", err)
-//	}
-//}
-//
-////removeTempDir удаляет временную директорию
-//func removeTempDir() {
-//	dir := "testdir"
-//	projectDir, err := os.Getwd()
-//	if err != nil {
-//		panic(err)
-//	}
-//	s := fmt.Sprintf("%s\\%s\\", projectDir, dir)
-//	err = os.RemoveAll(s)
-//	if err != nil {
-//		panic(err)
-//	}
-//}
-
 // createTempFile создает временный файл
 func createTempFile(t *testing.T, dir, name string) {
 	filePath := filepath.Join(dir, name)
