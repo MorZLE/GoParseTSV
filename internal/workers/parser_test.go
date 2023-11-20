@@ -65,10 +65,9 @@ func TestParser_Parse(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testdir := "testdir1"
-
-			createTempDir2(t, testdir)
-			defer removeTempDir2(testdir)
+			testdir := "testdir"
+			createTempDir(t, testdir)
+			defer removeTempDir(testdir)
 
 			createFile(testdir, tt.args.filename, tt.want)
 			s := &Parser{
@@ -89,7 +88,8 @@ func TestParser_Parse(t *testing.T) {
 	}
 }
 
-func createTempDir2(t *testing.T, dir string) {
+// createTempDir создает временную директорию
+func createTempDir(t *testing.T, dir string) {
 	err := os.Mkdir(dir, os.ModeDir)
 	if err != nil {
 		t.Fatalf("Failed to create temporary directory: %v", err)
@@ -99,7 +99,9 @@ func createTempDir2(t *testing.T, dir string) {
 		t.Fatalf("Failed to create Chmod directory: %v", err)
 	}
 }
-func removeTempDir2(dir string) {
+
+// removeTempDir удаляет временную директорию
+func removeTempDir(dir string) {
 	projectDir, err := os.Getwd()
 	if err != nil {
 		panic(err)

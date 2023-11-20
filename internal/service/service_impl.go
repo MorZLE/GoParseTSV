@@ -9,10 +9,12 @@ import (
 	"github.com/MorZLE/GoParseTSV/logger"
 )
 
+// NewServiceImpl создает новый экземпляр Service
 func NewServiceImpl(rep repository.Repository, watcher *workers.Watcher, writer *workers.Writer, parser *workers.Parser) Service {
 	return &serviceImpl{r: rep, wSkaner: watcher, wWriter: writer, wParser: parser}
 }
 
+// Service реализует интерфейс сервиса
 type serviceImpl struct {
 	r       repository.Repository
 	wSkaner *workers.Watcher
@@ -72,7 +74,7 @@ func (s *serviceImpl) Scan() {
 
 // GetAllGuid получает все guid из бд по уникальному номеру
 func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, error) {
-	if req.UnitGUID == "" || req.Limite <= 0 || req.Page < 0 {
+	if req.UnitGUID == "" || req.Limit <= 0 || req.Page < 0 {
 		return nil, constants.ErrEnabledData
 	}
 
@@ -89,14 +91,14 @@ func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, erro
 		if i < req.Page {
 			continue
 		}
-		if cPage > req.Limite {
+		if cPage > req.Limit {
 			guidsRes = append(guidsRes, gd)
 			gd = nil
 			gd = append(gd, guid)
 			cPage = 2
 			continue
 		}
-		if cPage <= req.Limite {
+		if cPage <= req.Limit {
 			gd = append(gd, guid)
 		}
 		cPage++

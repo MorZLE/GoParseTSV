@@ -38,11 +38,11 @@ func TestHandler_GetGuid(t *testing.T) {
 			args: args{
 				w: &httptest.ResponseRecorder{},
 				m: func(r *mocks.Service) {
-					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 6}).Return([][]model.Guid{
+					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 6}).Return([][]model.Guid{
 						{model.Guid{Number: "1"}, model.Guid{Number: "2"}, model.Guid{Number: "3"}, model.Guid{Number: "4"}, model.Guid{Number: "5"}, model.Guid{Number: "5"}},
 					}, nil)
 				},
-				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 6},
+				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 6},
 			},
 			wantRes: [][]model.Guid{
 				{model.Guid{Number: "1"}, model.Guid{Number: "2"}, model.Guid{Number: "3"}, model.Guid{Number: "4"}, model.Guid{Number: "5"}, model.Guid{Number: "5"}},
@@ -54,11 +54,11 @@ func TestHandler_GetGuid(t *testing.T) {
 			args: args{
 				w: &httptest.ResponseRecorder{},
 				m: func(r *mocks.Service) {
-					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 2}).Return([][]model.Guid{
+					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 2}).Return([][]model.Guid{
 						{model.Guid{Number: "1"}, model.Guid{Number: "2"}},
 					}, nil)
 				},
-				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 2},
+				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 2},
 			},
 			wantRes: [][]model.Guid{
 				{model.Guid{Number: "1"}, model.Guid{Number: "2"}},
@@ -70,9 +70,9 @@ func TestHandler_GetGuid(t *testing.T) {
 			args: args{
 				w: &httptest.ResponseRecorder{},
 				m: func(r *mocks.Service) {
-					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 2}).Return([][]model.Guid{}, constants.ErrNotFound)
+					r.On("GetAllGuid", model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 2}).Return([][]model.Guid{}, constants.ErrNotFound)
 				},
-				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limite: 2},
+				t: model.RequestGetGuid{UnitGUID: "124124j243-f32r", Page: 2, Limit: 2},
 			},
 			wantRes:  nil,
 			wantCode: 409,

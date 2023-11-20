@@ -2,6 +2,8 @@ package repository
 
 import "github.com/MorZLE/GoParseTSV/internal/model"
 
+// Repository интерфейс репозитория
+//
 //go:generate go run github.com/vektra/mockery/v2@v2.20.0 --name=Repository
 type Repository interface {
 	Set(guid []model.Guid) error

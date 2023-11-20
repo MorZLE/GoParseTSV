@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// NewWriter создает новый экземпляр Writer
 func NewWriter(cnf *config.Config) *Writer {
 	return &Writer{dirOUT: cnf.RepOUT}
 }

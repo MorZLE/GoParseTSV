@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// NewRepositoryImpl создает новый экземпляр Repository
 func NewRepositoryImpl(cnf *config.Config) (Repository, error) {
 	db, err := gorm.Open(postgres.Open(cnf.DB), &gorm.Config{})
 	if err != nil {
@@ -25,6 +26,7 @@ func NewRepositoryImpl(cnf *config.Config) (Repository, error) {
 	return &repositoryImpl{db: db}, nil
 }
 
+// repositoryImpl реализует интерфейс Repository
 type repositoryImpl struct {
 	db *gorm.DB
 }
