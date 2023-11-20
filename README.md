@@ -6,7 +6,7 @@
 ### При запуске укажите свой config файл  -с=config.json 
 
 # Пример
-congig.json
+config.json
 #### {
 #### "directory_in": "D:\\tsv",
 #### "directory_out": "D:\\pdf\\",
