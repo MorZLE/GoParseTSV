@@ -17,6 +17,7 @@ type Writer struct {
 	dirOUT string
 }
 
+// WriteFilePDF записывает структуру в файл pdf
 func (w *Writer) WriteFilePDF(guid []model.Guid, filename []string) error {
 	for _, f := range filename {
 		pdf := gopdf.GoPdf{}

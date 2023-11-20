@@ -20,6 +20,7 @@ type serviceImpl struct {
 	wParser *workers.Parser
 }
 
+// Scan запускает сканер
 func (s *serviceImpl) Scan() {
 	filesCheck, err := s.r.GetFileName()
 	if err != nil {
@@ -69,6 +70,7 @@ func (s *serviceImpl) Scan() {
 	}
 }
 
+// GetAllGuid получает все guid из бд по уникальному номеру
 func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, error) {
 	if req.UnitGUID == "" || req.Limite <= 0 || req.Page < 0 {
 		return nil, constants.ErrEnabledData

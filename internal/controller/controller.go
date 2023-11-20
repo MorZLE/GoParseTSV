@@ -22,6 +22,7 @@ func (h *Handler) Route(app *fiber.App) {
 	app.Post("/", h.GetGuid)
 }
 
+// GetGuid API отправляет guids по уникальному номеру
 func (h *Handler) GetGuid(c *fiber.Ctx) error {
 	var req model.RequestGetGuid
 	err := c.BodyParser(&req)
@@ -37,6 +38,7 @@ func (h *Handler) GetGuid(c *fiber.Ctx) error {
 	return c.JSON(body)
 }
 
+// ErrorHandler обработчик ошибок
 func ErrorHandler(c *fiber.Ctx, err error) error {
 	var unmarshalTypeError *json.UnmarshalTypeError
 	if err != nil {
@@ -53,12 +55,6 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 		if errors.Is(err, constants.ErrNotFound) {
 			err := fmt.Sprintf("not data %s", err)
 			return c.Status(409).JSON(fiber.Map{
-				"message": err,
-			})
-		}
-		if errors.Is(err, constants.ErrGetAllGuid) {
-			err := fmt.Sprintf("error %s", err)
-			return c.Status(500).JSON(fiber.Map{
 				"message": err,
 			})
 		}

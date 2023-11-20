@@ -29,6 +29,7 @@ type repositoryImpl struct {
 	db *gorm.DB
 }
 
+// Get получает все guid по уникальному номеру
 func (r *repositoryImpl) Get(guid string) ([]model.Guid, error) {
 	var guidAPI []model.Guid
 	if err := r.db.Where("unit_guid = ?", guid).Find(&guidAPI).Error; err != nil {
@@ -39,6 +40,8 @@ func (r *repositoryImpl) Get(guid string) ([]model.Guid, error) {
 	}
 	return guidAPI, nil
 }
+
+// Set записывает guid  в базу
 func (r *repositoryImpl) Set(guid []model.Guid) error {
 	if err := r.db.Create(&guid).Error; err != nil {
 		return fmt.Errorf("error create guid: %w", err)
@@ -46,6 +49,7 @@ func (r *repositoryImpl) Set(guid []model.Guid) error {
 	return nil
 }
 
+// SetError записывает ошибку в базу
 func (r *repositoryImpl) SetError(filename string, err error) error {
 	var guidErr model.Err
 	guidErr.File = filename
@@ -57,6 +61,7 @@ func (r *repositoryImpl) SetError(filename string, err error) error {
 	return nil
 }
 
+// SetFileName записывает имя обработанного файла в базу
 func (r *repositoryImpl) SetFileName(filename string) error {
 	if err := r.db.Create(&model.ParseFile{File: filename}).Error; err != nil {
 		return fmt.Errorf("error create guid: %w", err)
@@ -64,6 +69,7 @@ func (r *repositoryImpl) SetFileName(filename string) error {
 	return nil
 }
 
+// GetFileName получает названия обработанных файлов из базы
 func (r *repositoryImpl) GetFileName() ([]model.ParseFile, error) {
 	var filenames []model.ParseFile
 	if err := r.db.Find(&filenames).Error; err != nil {

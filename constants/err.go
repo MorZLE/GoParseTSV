@@ -3,7 +3,6 @@ package constants
 import "errors"
 
 var (
-	ErrGetAllGuid  = errors.New("err get guid")
-	ErrEnabledData = errors.New("enabled data")
-	ErrNotFound    = errors.New("data not found")
+	ErrEnabledData = errors.New("enabled data")   // ErrEnabledData ошибка не правильных данных
+	ErrNotFound    = errors.New("data not found") // ErrNotFound ошибка нет данных для представления
 )

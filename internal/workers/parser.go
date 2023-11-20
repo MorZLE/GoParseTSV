@@ -17,6 +17,7 @@ type Parser struct {
 	dirIN string
 }
 
+// Parse парсит файл по названию
 func (s *Parser) Parse(filename string) ([]model.Guid, []string, error) {
 
 	var slGuid []string

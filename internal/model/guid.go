@@ -1,5 +1,6 @@
 package model
 
+// Guid - структура guid
 type Guid struct {
 	Number       string `tsv:"n"`
 	MQTT         string `tsv:"mqtt"`
@@ -18,15 +19,18 @@ type Guid struct {
 	InvertBit    string `tsv:"invert_bit"`
 }
 
+// Err - структура ошибок
 type Err struct {
 	File string
 	Err  string
 }
 
+// ParseFile - структура обработанных файлов
 type ParseFile struct {
 	File string
 }
 
+// RequestGetGuid - структура запроса API
 type RequestGetGuid struct {
 	UnitGUID string `json:"unitguid"`
 	Page     int    `json:"page"`

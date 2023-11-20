@@ -28,6 +28,7 @@ func (w *Watcher) InitFileCheck(files []model.ParseFile) {
 	}
 }
 
+// Scan смотрит наличие новых файлов
 func (w *Watcher) Scan(out chan string) {
 	tick := time.NewTicker(time.Duration(w.tickerTime) * time.Second)
 	defer tick.Stop()
