@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/internal/controller"
-	"github.com/MorZLE/ParseTSVBiocad/internal/repository"
-	"github.com/MorZLE/ParseTSVBiocad/internal/service"
-	"github.com/MorZLE/ParseTSVBiocad/internal/workers"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/internal/controller"
+	"github.com/MorZLE/GoParseTSV/internal/repository"
+	"github.com/MorZLE/GoParseTSV/internal/service"
+	"github.com/MorZLE/GoParseTSV/internal/workers"
+	"github.com/MorZLE/GoParseTSV/logger"
 	"github.com/gofiber/fiber/v2"
 	lg "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"

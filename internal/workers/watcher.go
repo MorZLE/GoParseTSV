@@ -1,9 +1,9 @@
 package workers
 
 import (
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/logger"
 	"os"
 	"strings"
 	"sync"

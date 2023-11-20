@@ -3,9 +3,9 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/constants"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/constants"
+	"github.com/MorZLE/GoParseTSV/internal/model"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -2,9 +2,9 @@ package workers
 
 import (
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/logger"
 	"github.com/signintech/gopdf"
 	"strings"
 )
@@ -58,7 +58,11 @@ func (w *Writer) WriteFilePDF(guid []model.Guid, filename []string) error {
 				}
 
 				for _, field := range fields {
-					pdf.Text(field)
+					err := pdf.Text(field)
+					if err != nil {
+						logger.Error("Text", err)
+						return err
+					}
 					pdf.Br(20)
 				}
 			}

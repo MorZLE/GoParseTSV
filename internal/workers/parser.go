@@ -3,8 +3,8 @@ package workers
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/internal/model"
 	"os"
 )
 

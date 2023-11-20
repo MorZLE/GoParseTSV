@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/constants"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
-	"github.com/MorZLE/ParseTSVBiocad/internal/service"
+	"github.com/MorZLE/GoParseTSV/constants"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,12 +19,12 @@ type Handler struct {
 }
 
 func (h *Handler) Route(app *fiber.App) {
-	app.Get("/", h.GetGuid)
+	app.Post("/", h.GetGuid)
 }
 
 func (h *Handler) GetGuid(c *fiber.Ctx) error {
 	var req model.RequestGetGuid
-	err := c.QueryParser(&req)
+	err := c.BodyParser(&req)
 	if err != nil {
 		return ErrorHandler(c, err)
 	}

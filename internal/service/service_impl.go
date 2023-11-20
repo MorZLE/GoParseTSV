@@ -2,11 +2,11 @@ package service
 
 import (
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/constants"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
-	"github.com/MorZLE/ParseTSVBiocad/internal/repository"
-	"github.com/MorZLE/ParseTSVBiocad/internal/workers"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/constants"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/internal/repository"
+	"github.com/MorZLE/GoParseTSV/internal/workers"
+	"github.com/MorZLE/GoParseTSV/logger"
 )
 
 func NewServiceImpl(rep repository.Repository, watcher *workers.Watcher, writer *workers.Writer, parser *workers.Parser) Service {

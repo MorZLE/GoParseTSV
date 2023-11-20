@@ -4,7 +4,7 @@ info:
   title: API для получения guids
 paths:
   /:
-    get:
+    post:
       summary: Получение guids пользователя
       description: Эндпоинт для получения guids пользователя.
       requestBody:
@@ -31,14 +31,14 @@ components:
     RequestGetGuid:
       type: object
       properties:
-        unit-guid:
+        unitguid:
           type: string
         page:
           type: integer
         limit:
           type: integer
       required:
-        - unit-guid
+        - unitguid
         - page
         - limit
     Guid:
