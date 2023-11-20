@@ -21,6 +21,7 @@ func NewConfig() *Config {
 	return ParseFlags()
 }
 
+// ParseFlags парсит флаги
 func ParseFlags() *Config {
 
 	p := Config{}
@@ -38,6 +39,7 @@ func ParseFlags() *Config {
 
 }
 
+// ReadConfig читает конфиг из файлф
 func ReadConfig(cnf *Config) error {
 	file, err := os.Open(cnf.configFile)
 	if err != nil {

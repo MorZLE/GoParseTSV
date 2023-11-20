@@ -8,6 +8,7 @@ import (
 
 var mylog *zap.Logger = zap.NewNop()
 
+// Initialize инициализирует собственный zap logger
 func Initialize() {
 	lvl, err := zap.ParseAtomicLevel("info")
 	if err != nil {

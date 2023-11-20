@@ -26,7 +26,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "PosiveTest1",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   2,
+					Limit:    2,
 					Page:     1,
 					UnitGUID: "unitguid",
 				},
@@ -46,7 +46,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "PosiveTest2",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   4,
+					Limit:    4,
 					Page:     1,
 					UnitGUID: "unitguid",
 				},
@@ -71,7 +71,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "NegativeTest1",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   0,
+					Limit:    0,
 					Page:     1,
 					UnitGUID: "unitguid",
 				},
@@ -82,7 +82,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "NegativeTest2",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   2,
+					Limit:    2,
 					Page:     1,
 					UnitGUID: "",
 				},
@@ -93,7 +93,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "NegativeTest3",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   2,
+					Limit:    2,
 					Page:     -1,
 					UnitGUID: "",
 				},
@@ -104,7 +104,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "NegativeTest4",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   -2,
+					Limit:    -2,
 					Page:     1,
 					UnitGUID: "",
 				},
@@ -115,7 +115,7 @@ func Test_serviceImpl_GetAllGuid(t *testing.T) {
 		{name: "ErrDBTest5",
 			args: args{
 				req: model.RequestGetGuid{
-					Limite:   2,
+					Limit:    2,
 					Page:     1,
 					UnitGUID: "afawf",
 				},

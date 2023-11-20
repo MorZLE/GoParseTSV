@@ -34,5 +34,5 @@ type ParseFile struct {
 type RequestGetGuid struct {
 	UnitGUID string `json:"unitguid"`
 	Page     int    `json:"page"`
-	Limite   int    `json:"limite"`
+	Limit    int    `json:"limit"`
 }

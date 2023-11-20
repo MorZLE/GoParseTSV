@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// NewWatcher создает новый экземпляр Watcher
 func NewWatcher(cnf *config.Config) *Watcher {
 	m := make(map[string]bool)
 	return &Watcher{tickerTime: cnf.Timer, dirIN: cnf.RepIN, fileCheck: m}

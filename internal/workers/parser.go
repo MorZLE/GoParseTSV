@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// NewParser создает новый экземпляр Parser
 func NewParser(cnf *config.Config) *Parser {
 	return &Parser{dirIN: cnf.RepIN}
 }

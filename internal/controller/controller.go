@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// NewHandler создает новый экземпляр Handler
 func NewHandler(s service.Service) *Handler {
 	return &Handler{s}
 }
@@ -18,6 +19,7 @@ type Handler struct {
 	s service.Service
 }
 
+// Route Роут контроллера
 func (h *Handler) Route(app *fiber.App) {
 	app.Post("/", h.GetGuid)
 }
