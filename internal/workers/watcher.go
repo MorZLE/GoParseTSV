@@ -1,8 +1,9 @@
-package watcher
+package workers
 
 import (
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/config"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/logger"
 	"os"
 	"strings"
 	"sync"
@@ -21,6 +22,13 @@ type Watcher struct {
 	mutex      sync.RWMutex
 }
 
+func (w *Watcher) InitFileCheck(files []model.ParseFile) {
+	for _, file := range files {
+		w.fileCheck[file.File] = true
+	}
+}
+
+// Scan смотрит наличие новых файлов
 func (w *Watcher) Scan(out chan string) {
 	tick := time.NewTicker(time.Duration(w.tickerTime) * time.Second)
 	defer tick.Stop()
@@ -30,7 +38,6 @@ func (w *Watcher) Scan(out chan string) {
 		if err != nil {
 			logger.Fatal("err read dir", err)
 		}
-
 		for _, file := range files {
 			if !file.IsDir() && len(file.Name()) >= 4 && strings.HasSuffix(file.Name(), ".tsv") {
 				w.mutex.Lock()

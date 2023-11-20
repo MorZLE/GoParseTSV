@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
+	"github.com/MorZLE/GoParseTSV/logger"
 	"io"
 	"os"
 )

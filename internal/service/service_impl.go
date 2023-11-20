@@ -1,36 +1,40 @@
 package service
 
 import (
-	"encoding/csv"
 	"fmt"
-	"github.com/MorZLE/ParseTSVBiocad/config"
-	"github.com/MorZLE/ParseTSVBiocad/internal/model"
-	"github.com/MorZLE/ParseTSVBiocad/internal/repository"
-	"github.com/MorZLE/ParseTSVBiocad/internal/watcher"
-	"github.com/MorZLE/ParseTSVBiocad/logger"
-	"github.com/jung-kurt/gofpdf"
-	"os"
-	"strings"
+	"github.com/MorZLE/GoParseTSV/constants"
+	"github.com/MorZLE/GoParseTSV/internal/model"
+	"github.com/MorZLE/GoParseTSV/internal/repository"
+	"github.com/MorZLE/GoParseTSV/internal/workers"
+	"github.com/MorZLE/GoParseTSV/logger"
 )
 
-func NewServiceImpl(cnf *config.Config, rep repository.Repository, watcher *watcher.Watcher) Service {
-	return &serviceImpl{r: rep, w: watcher, dirIN: cnf.RepIN, dirOUT: cnf.RepOUT}
+func NewServiceImpl(rep repository.Repository, watcher *workers.Watcher, writer *workers.Writer, parser *workers.Parser) Service {
+	return &serviceImpl{r: rep, wSkaner: watcher, wWriter: writer, wParser: parser}
 }
 
 type serviceImpl struct {
-	r      repository.Repository
-	w      *watcher.Watcher
-	dirIN  string
-	dirOUT string
+	r       repository.Repository
+	wSkaner *workers.Watcher
+	wWriter *workers.Writer
+	wParser *workers.Parser
 }
 
+// Scan запускает сканер
 func (s *serviceImpl) Scan() {
+	filesCheck, err := s.r.GetFileName()
+	if err != nil {
+		logger.Fatal("", err)
+		return
+	}
+	s.wSkaner.InitFileCheck(filesCheck)
+
 	out := make(chan string)
 	defer close(out)
 
-	go s.w.Scan(out)
+	go s.wSkaner.Scan(out)
 	for file := range out {
-		parsGuid, slGuid, err := s.parse(file)
+		parsGuid, slGuid, err := s.wParser.Parse(file)
 		if err != nil {
 			logger.Error("ошибка:", err)
 			err := s.r.SetError(file, err)
@@ -39,7 +43,7 @@ func (s *serviceImpl) Scan() {
 			}
 			continue
 		}
-		err = s.r.Set(parsGuid)
+		err = s.r.Set(parsGuid[1:])
 		if err != nil {
 			logger.Error("ошибка:", err)
 			err := s.r.SetError(file, err)
@@ -48,7 +52,7 @@ func (s *serviceImpl) Scan() {
 			}
 			continue
 		}
-		err = s.writeFilePDF(parsGuid, slGuid)
+		err = s.wWriter.WriteFilePDF(parsGuid, slGuid)
 		if err != nil {
 			logger.Error("ошибка:", err)
 			err := s.r.SetError(file, err)
@@ -57,110 +61,49 @@ func (s *serviceImpl) Scan() {
 			}
 			continue
 		}
-		logger.Info(fmt.Sprintf("файл: %s обработан", file))
+		err = s.r.SetFileName(file)
+		if err != nil {
+			logger.Error("ошибка внесения имени обработанного файла в базу:", err)
+		} else {
+			logger.Info(fmt.Sprintf("файл: %s обработан", file))
+		}
 	}
-
 }
 
-func (s *serviceImpl) writeFilePDF(guid []model.Guid, filename []string) error {
-	for _, f := range filename {
-		pdf := gofpdf.New("P", "mm", "A4", f)
-		pdf.SetFont("Arial", "B", 8)
-
-		for _, g := range guid {
-			if g.UnitGUID == f {
-				pdf.AddPage()
-				pdf.Text(10, 10, strings.TrimSpace(guid[0].Number)+":")
-				pdf.Text(10, 20, strings.TrimSpace(guid[0].MQTT)+":")
-				pdf.Text(10, 30, strings.TrimSpace(guid[0].InventoryID)+":")
-				pdf.Text(10, 40, strings.TrimSpace(guid[0].MessageID)+":")
-				pdf.Text(10, 50, strings.TrimSpace(guid[0].MessageText)+":")
-				pdf.Text(10, 60, strings.TrimSpace(guid[0].Context)+":")
-				pdf.Text(10, 70, strings.TrimSpace(guid[0].MessageClass)+":")
-				pdf.Text(10, 80, strings.TrimSpace(guid[0].Level)+":")
-				pdf.Text(10, 90, strings.TrimSpace(guid[0].Area)+":")
-				pdf.Text(10, 100, strings.TrimSpace(guid[0].Address)+":")
-				pdf.Text(10, 120, strings.TrimSpace(guid[0].Block)+":")
-				pdf.Text(10, 130, strings.TrimSpace(guid[0].Type)+":")
-				pdf.Text(10, 140, strings.TrimSpace(guid[0].Bit)+":")
-				pdf.Text(10, 150, strings.TrimSpace(guid[0].InvertBit)+":")
-
-				pdf.Text(30, 10, strings.TrimSpace(g.Number))
-				pdf.Text(30, 20, strings.TrimSpace(g.MQTT))
-				pdf.Text(30, 30, strings.TrimSpace(g.InventoryID))
-				pdf.Text(30, 40, strings.TrimSpace(g.MessageID))
-				pdf.Text(30, 50, strings.TrimSpace(g.MessageText))
-				pdf.Text(30, 60, strings.TrimSpace(g.Context))
-				pdf.Text(30, 70, strings.TrimSpace(g.MessageClass))
-				pdf.Text(30, 80, strings.TrimSpace(g.Level))
-				pdf.Text(30, 90, strings.TrimSpace(g.Area))
-				pdf.Text(30, 100, strings.TrimSpace(g.Address))
-				pdf.Text(30, 120, strings.TrimSpace(g.Block))
-				pdf.Text(30, 130, strings.TrimSpace(g.Type))
-				pdf.Text(30, 150, strings.TrimSpace(g.InvertBit))
-			}
-		}
-
-		trimmedFilename := strings.TrimSpace(f)
-		outputFilename := s.dirOUT + trimmedFilename + ".pdf"
-		pdf.OutputFileAndClose(outputFilename)
+// GetAllGuid получает все guid из бд по уникальному номеру
+func (s *serviceImpl) GetAllGuid(req model.RequestGetGuid) ([][]model.Guid, error) {
+	if req.UnitGUID == "" || req.Limite <= 0 || req.Page < 0 {
+		return nil, constants.ErrEnabledData
 	}
 
-	return nil
-}
-
-func (s *serviceImpl) parse(filename string) ([]model.Guid, []string, error) {
-
-	var slGuid []string
-	mGuid := make(map[string]bool)
-
-	filename = fmt.Sprintf("%s/%s", s.dirIN, filename)
-	file, err := os.Open(filename)
-	defer file.Close()
-
+	guids, err := s.r.Get(req.UnitGUID)
 	if err != nil {
-		return nil, nil, fmt.Errorf("ошибка при открытии файла", err)
+		return nil, err
 	}
 
-	reader := csv.NewReader(file)
-	reader.Comma = '\t' // Устанавливаем разделитель как табуляцию
+	var guidsRes [][]model.Guid
+	var gd []model.Guid
+	cPage := 1
 
-	records, err := reader.ReadAll()
-	if err != nil {
-		return nil, nil, fmt.Errorf("ошибка при чтение файла %s", filename, err)
-	}
-
-	var guid []model.Guid
-
-	for i, record := range records {
-
-		unitGUID := record[3]
-		if i != 0 {
-			if !mGuid[unitGUID] {
-				mGuid[unitGUID] = true
-				slGuid = append(slGuid, unitGUID)
-			}
+	for i, guid := range guids {
+		if i < req.Page {
+			continue
 		}
-
-		g := model.Guid{
-			Number:       record[0],
-			MQTT:         record[1],
-			InventoryID:  record[2],
-			UnitGUID:     unitGUID,
-			MessageID:    record[4],
-			MessageText:  record[5],
-			Context:      record[6],
-			MessageClass: record[7],
-			Level:        record[8],
-			Area:         record[9],
-			Address:      record[10],
-			Block:        record[11],
-			Type:         record[12],
-			Bit:          record[13],
-			InvertBit:    record[14],
+		if cPage > req.Limite {
+			guidsRes = append(guidsRes, gd)
+			gd = nil
+			gd = append(gd, guid)
+			cPage = 2
+			continue
 		}
-		guid = append(guid, g)
-
+		if cPage <= req.Limite {
+			gd = append(gd, guid)
+		}
+		cPage++
 	}
-	return guid, slGuid, nil
+	if gd != nil {
+		guidsRes = append(guidsRes, gd)
+	}
+
+	return guidsRes, nil
 }
